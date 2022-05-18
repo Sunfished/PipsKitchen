@@ -122,8 +122,6 @@ declare namespace preact {
 		vnode?: (vnode: VNode<any>) => void;
 		event?: (event: Event) => Event;
 	};
-
-	const Fragment: ComponentConstructor<{}, {}>;
 }
 
 declare global {

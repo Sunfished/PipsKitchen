@@ -51,7 +51,7 @@
 
 		focus: function (e, focusTextbox) {
 			var target = e && e.target;
-			if (target && ['TEXTAREA', 'INPUT'].includes(target.tagName)) {
+			if (target && target.tagName === 'TEXTAREA') {
 				// this workaround works for iOS 12 but not iOS 13
 				/* if (window.isiOS) {
 					// iOS will not bring up a keyboard unless you manually blur and refocus
@@ -115,9 +115,6 @@
 		submit: function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			if (e.currentTarget.getAttribute('data-submitsend')) {
-				return app.submitSend(e);
-			}
 			var text = this.$chatbox.val();
 			if (!text) return;
 			if (!$.trim(text)) {
@@ -127,11 +124,7 @@
 			this.tabComplete.reset();
 			this.chatHistory.push(text);
 			text = this.parseCommand(text);
-			if (
-				this.battle && this.battle.ignoreSpects &&
-				app.user.get('userid') !== this.battle.p1.id && app.user.get('userid') !== this.battle.p2.id &&
-				!(text.startsWith('/') && !text.startsWith('/me'))
-			) {
+			if (this.battle && this.battle.ignoreSpects && app.user.get('userid') !== this.battle.p1.id && app.user.get('userid') !== this.battle.p2.id) {
 				this.add("You can't chat in this battle as you're currently ignoring spectators");
 			} else if (text.length > 80000) {
 				app.addPopupMessage("Your message is too long.");
@@ -605,29 +598,9 @@
 				} else {
 					app.ignore[toUserid(target)] = 1;
 					this.add("User '" + toName(target) + "' ignored. (Moderator messages will not be ignored.)");
-					app.saveIgnore();
 				}
 				return false;
 
-			case 'clearignore':
-				if (this.checkBroadcast(cmd, text)) return false;
-				if (!target) {
-					this.parseCommand('/help ignore');
-					return false;
-				}
-				if (toID(target) !== 'confirm') {
-					this.add("Are you sure you want to clear your ignore list?");
-					this.add('|html|If you\'re sure, use <code>/clearignore confirm</code>');
-					return false;
-				}
-				if (!Object.keys(app.ignore).length) {
-					this.add("You have no ignored users.");
-					return false;
-				}
-				app.ignore = {};
-				app.saveIgnore();
-				this.add("Your ignore list was cleared.");
-				return false;
 			case 'unignore':
 				if (this.checkBroadcast(cmd, text)) return false;
 				if (!target) {
@@ -639,7 +612,6 @@
 				} else {
 					delete app.ignore[toUserid(target)];
 					this.add("User '" + toName(target) + "' no longer ignored.");
-					app.saveIgnore();
 				}
 				return false;
 
@@ -1076,6 +1048,7 @@
 			// documentation of client commands
 			case 'help':
 			case 'h':
+				if (this.checkBroadcast(cmd, text)) return false;
 				switch (toID(target)) {
 				case 'chal':
 				case 'chall':
@@ -1107,7 +1080,6 @@
 					this.add('/ignore [user] - Ignore all messages from the user [user].');
 					this.add('/unignore [user] - Remove the user [user] from your ignore list.');
 					this.add('/ignorelist - List all the users that you currently ignore.');
-					this.add('/clearignore - Remove all users on your ignore list.');
 					this.add('Note that staff messages cannot be ignored.');
 					return false;
 				case 'nick':
@@ -1693,18 +1665,10 @@
 		addChat: function (name, message, pm, msgTime) {
 			var userid = toUserid(name);
 
-			var speakerHasAuth = !" +\u2606".includes(name.charAt(0));
+			var speakerHasAuth = " +\u2606".indexOf(name.charAt(0)) < 0;
 			var user = (this.users && this.users[app.user.get('userid')]) || {};
-			var readerHasAuth = !" +\u2606\u203D\u2716!".includes(user.group || ' ');
-			if (app.ignore[userid] && !speakerHasAuth && !readerHasAuth) {
-				if (!app.ignoreNotified) {
-					this.$chat.append(
-						'<div class="chat">A message from ' + BattleLog.escapeHTML(name) + ' was ignored. (to unignore use /unignore)</div>'
-					);
-					app.ignoreNotified = true;
-				}
-				return;
-			}
+			var readerHasAuth = !" +\u2606\u203D!".includes(user.group || ' ');
+			if (app.ignore[userid] && !speakerHasAuth && !readerHasAuth) return;
 
 			// Add this user to the list of people who have spoken recently.
 			this.markUserActive(userid);
@@ -1928,20 +1892,20 @@
 		comparator: function (a, b) {
 			if (a === b) return 0;
 
-			var aUser = this.room.users[a] || {group: Config.defaultGroup, away: false};
-			var bUser = this.room.users[b] || {group: Config.defaultGroup, away: false};
+			var aUser = this.room.users[a];
+			var bUser = this.room.users[b];
 
 			var aRank = (
-				Config.groups[aUser.group || ' '] ||
+				Config.groups[aUser ? aUser.group : Config.defaultGroup || ' '] ||
 				{order: (Config.defaultOrder || 10006.5)}
 			).order;
 			var bRank = (
-				Config.groups[bUser.group || ' '] ||
+				Config.groups[bUser ? bUser.group : Config.defaultGroup || ' '] ||
 				{order: (Config.defaultOrder || 10006.5)}
 			).order;
 
 			if (aRank !== bRank) return aRank - bRank;
-			if ((aUser.away ? 1 : 0) !== (bUser.away ? 1 : 0)) return (aUser.away ? 1 : 0) - (bUser.away ? 1 : 0);
+			if (aUser.away !== bUser.away) return aUser.away - bUser.away;
 			return (a > b ? 1 : -1);
 		},
 		getNoNamedUsersOnline: function () {

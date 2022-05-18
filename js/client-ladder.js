@@ -2,8 +2,7 @@
 
 	var HTMLRoom = this.HTMLRoom = this.Room.extend({
 		events: {
-			'click .username': 'clickUsername',
-			'submit form': 'submitSend'
+			'click .username': 'clickUsername'
 		},
 		type: 'html',
 		title: 'Page',
@@ -14,9 +13,6 @@
 		send: function (data) {
 			// HTML rooms don't actually exist server side, so send globally
 			app.send(data);
-		},
-		submitSend: function (e) {
-			return app.submitSend(e);
 		},
 		receive: function (data) {
 			this.add(data);

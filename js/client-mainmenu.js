@@ -168,13 +168,8 @@
 
 		addPM: function (name, message, target) {
 			var userid = toUserid(name);
-			if (app.ignore[userid] && " +\u2606\u203D\u2716!".includes(name.charAt(0))) {
-				if (!app.ignoreNotified) {
-					message = '/nonotify A message from ' + BattleLog.escapeHTML(name) + ' was ignored.';
-					app.ignoreNotified = true;
-				}
-				return;
-			}
+			if (app.ignore[userid] && name.substr(0, 1) in {' ': 1, '+': 1, '!': 1, '✖': 1, '‽': 1}) return;
+
 			var isSelf = (toID(name) === app.user.get('userid'));
 			var oName = isSelf ? target : name;
 			Storage.logChat('pm-' + toID(oName), '' + name + ': ' + message);
@@ -401,7 +396,6 @@
 				} else {
 					app.ignore[userid] = 1;
 					$chat.append('<div class="chat">User ' + userid + ' ignored. (Moderator messages will not be ignored.)</div>');
-					app.saveIgnore();
 				}
 				break;
 			case 'unignore':
@@ -410,7 +404,6 @@
 				} else {
 					delete app.ignore[userid];
 					$chat.append('<div class="chat">User ' + userid + ' no longer ignored.</div>');
-					app.saveIgnore();
 				}
 				break;
 			case 'nick':
@@ -452,10 +445,6 @@
 				text = ('\n' + text).replace(/\n/g, '\n/pm ' + userid + ', ').slice(1);
 				if (text.length > 80000) {
 					app.addPopupMessage("Your message is too long.");
-					return;
-				}
-				if (!(text.startsWith('/') || text.startsWith('!')) && app.ignore[userid]) {
-					app.addPopupMessage("You can't PM a user you've ignored. Use /unignore to remove them from your ignore list.");
 					return;
 				}
 				this.send(text);
@@ -721,7 +710,7 @@
 						buf += '<p><label class="label">Format:</label>' + self.renderFormats(format, true) + '</p>';
 						buf += '<p><label class="label">Team:</label>' + self.renderTeams(format) + '</p>';
 						buf += '<p><label class="checkbox"><input type="checkbox" name="private" ' + (Storage.prefs('disallowspectators') ? 'checked' : '') + ' /> <abbr title="You can still invite spectators by giving them the URL or using the /invite command">Don\'t allow spectators</abbr></label></p>';
-						buf += '<p class="buttonbar"><button name="acceptChallenge"><strong>Accept</strong></button> <button type="button" name="rejectChallenge">Reject</button></p></form>';
+						buf += '<p class="buttonbar"><button name="acceptChallenge"><strong>Accept</strong></button> <button name="rejectChallenge">Reject</button></p></form>';
 						$challenge.html(buf);
 						if (format.substr(0, 4) === 'gen5') atLeastOneGen5 = true;
 					}
@@ -821,7 +810,7 @@
 			buf += '<p><label class="label">Format:</label>' + this.renderFormats(format) + '</p>';
 			buf += '<p><label class="label">Team:</label>' + this.renderTeams(format) + '</p>';
 			buf += '<p><label class="checkbox"><input type="checkbox" name="private" ' + (Storage.prefs('disallowspectators') ? 'checked' : '') + ' /> <abbr title="You can still invite spectators by giving them the URL or using the /invite command">Don\'t allow spectators</abbr></label></p>';
-			buf += '<p class="buttonbar"><button name="makeChallenge"><strong>Challenge</strong></button> <button type="button" name="dismissChallenge">Cancel</button></p></form>';
+			buf += '<p class="buttonbar"><button name="makeChallenge"><strong>Challenge</strong></button> <button name="dismissChallenge">Cancel</button></p></form>';
 			$challenge.html(buf);
 		},
 		acceptChallenge: function (i, target) {
@@ -887,7 +876,7 @@
 		},
 		adjustPrivacy: function (disallowSpectators) {
 			Storage.prefs('disallowspectators', disallowSpectators);
-			if (disallowSpectators) return '/noreply /hidenext\n';
+			if (disallowSpectators) return '/noreply /ionext\n'; // TODO: switch to /hidenext once it adds a password
 			var settings = app.user.get('settings');
 			return (settings.hiddenNextBattle ? '/noreply /hidenext off\n' : '') + (settings.inviteOnlyNextBattle ? '/noreply /ionext off\n' : '');
 		},

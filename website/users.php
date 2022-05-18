@@ -289,8 +289,7 @@ if (!$user) {
 				Use this link:
 			</p>
 			<p style="margin: 1em -13px">
-				<small><code>https://<?= $psconfig['routes']['root'] ?>/resetpassword/<?= $token ?></code></small><br />
-				<button name="copyUrl" value="<?= $token ?>">Copy URL</button>
+				<small><code>https://<?= $psconfig['routes']['root'] ?>/resetpassword/<?php echo $token; ?></code></small>
 			</p>
 		</div>
 <?php
@@ -447,7 +446,7 @@ if (!$user) {
 		</p>
 <?php
 	}
-	if ($user['userid'] === 'slarty' || $user['userid'] === 'peterthegreeat' || $user['userid'] === 'chrisloud' || $user['userid'] === 'skitty') {
+	if ($user['userid'] === 'slarty' || $user['userid'] === 'peterthegreeat' || $user['userid'] === 'chrisloud') {
 		echo '<p>;_;7</p>';
 	}
 

@@ -5,7 +5,7 @@
  * @license AGPLv3
  */
 
-type RoomInfo = {title: string, desc?: string, userCount?: number, section?: string, spotlight?: string, subRooms?: string[]};
+type RoomInfo = {title: string, desc?: string, userCount?: number, subRooms?: string[]};
 
 class MainMenuRoom extends PSRoom {
 	readonly classType: string = 'mainmenu';
@@ -14,14 +14,14 @@ class MainMenuRoom extends PSRoom {
 		avatar?: string | number,
 		status?: string,
 		group?: string,
-		customgroup?: string,
 		rooms?: {[roomid: string]: {isPrivate?: true, p1?: string, p2?: string}},
 	}} = {};
 	roomsCache: {
 		battleCount?: number,
 		userCount?: number,
 		chat?: RoomInfo[],
-		sectionTitles?: string[],
+		official?: RoomInfo[],
+		pspl?: RoomInfo[],
 	} = {};
 	receiveLine(args: Args) {
 		const [cmd] = args;
@@ -241,16 +241,6 @@ class MainMenuRoom extends PSRoom {
 			if (userRoom) userRoom.update(null);
 			break;
 		case 'rooms':
-			if (response.pspl) {
-				for (const roomInfo of response.pspl) roomInfo.spotlight = "Spotlight";
-				response.chat = [...response.pspl, ...response.chat];
-				response.pspl = null;
-			}
-			if (response.official) {
-				for (const roomInfo of response.official) roomInfo.section = "Official";
-				response.chat = [...response.official, ...response.chat];
-				response.official = null;
-			}
 			this.roomsCache = response;
 			const roomsRoom = PS.rooms[`rooms`] as RoomsRoom;
 			if (roomsRoom) roomsRoom.update(null);
@@ -267,13 +257,6 @@ class MainMenuRoom extends PSRoom {
 				battlesRoom.battles = battles;
 				battlesRoom.update(null);
 			}
-			break;
-		case 'laddertop':
-			const ladderRoomEntries = Object.entries(PS.rooms).filter(entry => entry[0].startsWith('ladder'));
-			for (const [, ladderRoom] of ladderRoomEntries) {
-				(ladderRoom as LadderRoom).update(response);
-			}
-			break;
 		}
 	}
 }
@@ -293,10 +276,6 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 	submit = (e: Event) => {
 		alert('todo: implement');
 	};
-	handleDragStart = (e: DragEvent) => {
-		const roomid = (e.currentTarget as HTMLElement).getAttribute('data-roomid') as RoomID;
-		PS.dragging = {type: 'room', roomid};
-	};
 	renderMiniRoom(room: PSRoom) {
 		const roomType = PS.roomTypes[room.type];
 		const Panel = roomType ? roomType.Component : PSRoomPanel;
@@ -307,7 +286,7 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 			const room = PS.rooms[roomid]!;
 			return <div class="pmbox">
 				<div class="mini-window">
-					<h3 draggable onDragStart={this.handleDragStart} data-roomid={roomid}>
+					<h3>
 						<button class="closebutton" name="closeRoom" value={roomid} aria-label="Close" tabIndex={-1}><i class="fa fa-times-circle"></i></button>
 						<button class="minimizebutton" tabIndex={-1}><i class="fa fa-minus-circle"></i></button>
 						{room.title}
@@ -317,41 +296,27 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 			</div>;
 		});
 	}
-	renderSearchButton() {
-		if (PS.down) {
-			return <div class="menugroup" style="background: rgba(10,10,10,.6)">
-				{PS.down === 'ddos' ?
-					<p class="error"><strong>Pok&eacute;mon Showdown is offline due to a DDoS attack!</strong></p>
-				:
-					<p class="error"><strong>Pok&eacute;mon Showdown is offline due to technical difficulties!</strong></p>
-				}
-				<p>
-					<div style={{textAlign: 'center'}}>
-						<img width="96" height="96" src={`//${Config.routes.client}/sprites/gen5/teddiursa.png`} alt="" />
-					</div>
-					Bear with us as we freak out.
-				</p>
-				<p>(We'll be back up in a few hours.)</p>
-			</div>;
-		}
-
-		if (!PS.user.userid || PS.isOffline) {
-			return <TeamForm class="menugroup" onSubmit={this.submit}>
-				<button class="mainmenu1 big button disabled" name="search">
-					<em>{PS.isOffline ? "Disconnected" : "Connecting..."}</em>
-				</button>
-			</TeamForm>;
-		}
-
-		return <TeamForm class="menugroup" onSubmit={this.submit}>
-			<button class="mainmenu1 big button" name="search">
+	render() {
+		const onlineButton = ' button' + (PS.isOffline ? ' disabled' : '');
+		const searchButton = (PS.down ? <div class="menugroup" style="background: rgba(10,10,10,.6)">
+			{PS.down === 'ddos' ?
+				<p class="error"><strong>Pok&eacute;mon Showdown is offline due to a DDoS attack!</strong></p>
+			:
+				<p class="error"><strong>Pok&eacute;mon Showdown is offline due to technical difficulties!</strong></p>
+			}
+			<p>
+				<div style={{textAlign: 'center'}}>
+					<img width="96" height="96" src={`//${Config.routes.client}/sprites/gen5/teddiursa.png`} alt="" />
+				</div>
+				Bear with us as we freak out.
+			</p>
+			<p>(We'll be back up in a few hours.)</p>
+		</div> : <TeamForm class="menugroup" onSubmit={this.submit}>
+			<button class={"mainmenu1 big" + onlineButton} name="search">
 				<strong>Battle!</strong><br />
 				<small>Find a random opponent</small>
 			</button>
-		</TeamForm>;
-	}
-	render() {
-		const onlineButton = ' button' + (PS.isOffline ? ' disabled' : '');
+		</TeamForm>);
 		return <PSPanelWrapper room={this.props.room} scrollable>
 			<div class="mainmenuwrapper">
 				<div class="leftmenu">
@@ -359,7 +324,7 @@ class MainMenuPanel extends PSRoomPanel<MainMenuRoom> {
 						{this.renderMiniRooms()}
 					</div>
 					<div class="mainmenu">
-						{this.renderSearchButton()}
+						{searchButton}
 
 						<div class="menugroup">
 							<p><button class="mainmenu2 button" name="joinRoom" value="teambuilder">Teambuilder</button></p>

@@ -121,24 +121,24 @@ class PSTeambuilder {
 			set.name = parts[0];
 
 			// species
-			set.species = Dex.species.get(parts[1]).name || set.name;
+			set.species = Dex.getSpecies(parts[1]).name || set.name;
 
 			// item
-			set.item = Dex.items.get(parts[2]).name;
+			set.item = Dex.getItem(parts[2]).name;
 
 			// ability
-			const species = Dex.species.get(set.species);
+			const species = Dex.getSpecies(set.species);
 			set.ability = parts[3] === '-' ?
 				'' :
 				(species.baseSpecies === 'Zygarde' && parts[3] === 'H') ?
 				'Power Construct' :
 				['', '0', '1', 'H', 'S'].includes(parts[3]) ?
 				species.abilities[parts[3] as '0' || '0'] || (parts[3] === '' ? '' : '!!!ERROR!!!') :
-				Dex.abilities.get(parts[3]).name;
+				Dex.getAbility(parts[3]).name;
 
 			// moves
 			set.moves = parts[4].split(',').map(moveid =>
-				Dex.moves.get(moveid).name
+				Dex.getMove(moveid).name
 			);
 
 			// nature
@@ -321,10 +321,10 @@ class PSTeambuilder {
 			}
 			let parenIndex = line.lastIndexOf(' (');
 			if (line.charAt(line.length - 1) === ')' && parenIndex !== -1) {
-				set.species = Dex.species.get(line.slice(parenIndex + 2, -1)).name;
+				set.species = Dex.getSpecies(line.slice(parenIndex + 2, -1)).name;
 				set.name = line.slice(0, parenIndex);
 			} else {
-				set.species = Dex.species.get(line).name;
+				set.species = Dex.getSpecies(line).name;
 				set.name = '';
 			}
 		} else if (line.startsWith('Trait: ')) {
@@ -387,9 +387,9 @@ class PSTeambuilder {
 			if (line.startsWith('Hidden Power [')) {
 				const hpType = line.slice(14, -1) as TypeName;
 				line = 'Hidden Power ' + hpType;
-				if (!set.ivs && Dex.types.isName(hpType)) {
+				if (!set.ivs && window.BattleTypeChart && window.BattleTypeChart[hpType]) {
 					set.ivs = {hp: 31, atk: 31, def: 31, spa: 31, spd: 31, spe: 31};
-					const hpIVs = Dex.types.get(hpType).HPivs || {};
+					const hpIVs = Dex.getType(hpType).HPivs || {};
 					for (let stat in hpIVs) {
 						set.ivs[stat as StatName] = hpIVs[stat as StatName]!;
 					}

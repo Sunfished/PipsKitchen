@@ -218,7 +218,7 @@ function toId() {
 		getActionPHP: function () {
 			var ret = '/~~' + Config.server.id + '/action.php';
 			if (Config.testclient) {
-				ret = 'https://' + Config.routes.client + ret;
+				ret = 'https://play.pokemonshowdown.com/action.php';
 			}
 			return (this.getActionPHP = function () {
 				return ret;
@@ -388,9 +388,6 @@ function toId() {
 		routes: {
 			'*path': 'dispatchFragment'
 		},
-		events: {
-			'submit form': 'submitSend'
-		},
 		focused: true,
 		initialize: function () {
 			window.app = this;
@@ -455,7 +452,6 @@ function toId() {
 					if (Object.keys(settings).length) app.user.set('settings', settings);
 					// HTML5 history throws exceptions when running on file://
 					Backbone.history.start({pushState: !Config.testclient});
-					app.ignore = app.loadIgnore();
 				});
 			}
 
@@ -713,17 +709,7 @@ function toId() {
 		connect: function () {
 			if (this.down) return;
 
-			if (Config.bannedHosts) {
-				for (var i = 0; i < Config.bannedHosts.length; i++) {
-					var host = Config.bannedHosts[i];
-					if (typeof host === 'string' ? Config.server.host === host : host.test(Config.server.host)) {
-						Config.server.banned = true;
-						break;
-					}
-				}
-			}
-
-			if (Config.server.banned) {
+			if (Config.server.banned || (Config.bannedHosts && Config.bannedHosts.indexOf(Config.server.host) >= 0)) {
 				this.addPopupMessage("This server has been deleted for breaking US laws, impersonating PS global staff, or other major rulebreaking.");
 				return;
 			}
@@ -831,37 +817,6 @@ function toId() {
 			}
 			this.socket.send(data);
 		},
-		serializeForm: function (form) {
-			// querySelector dates back to IE8 so we can use it
-			// fortunate, because form serialization is a HUGE MESS in older browsers
-			var elements = form.querySelectorAll('input[name], select[name], textarea[name], keygen[name]');
-			var out = [];
-			for (var i = 0; i < elements.length; i++) {
-				var element = elements[i];
-				// TODO: values are a mess in the DOM; checkboxes/select probably need special handling
-				out.push([element.name, element.value]);
-			}
-			return out;
-		},
-		submitSend: function (e) {
-			// Most of the code relating to this is nightmarish because of some dumb choices
-			// made when writing the original Backbone code. At least in the Preact client, event
-			// handling is a lot more straightforward because it doesn't rely on Backbone's event
-			// dispatch system.
-			var target = e.currentTarget;
-			var dataSend = target.getAttribute('data-submitsend');
-			if (dataSend) {
-				var toSend = dataSend;
-				var entries = this.serializeForm(target);
-				for (var i = 0; i < entries.length; i++) {
-					toSend = toSend.replace('{' + entries[i][0] + '}', entries[i][1]);
-				}
-				this.send(toSend);
-				e.currentTarget.innerText = 'Submitted!';
-				e.preventDefault();
-				e.stopPropagation();
-			}
-		},
 		/**
 		 * Send team to sim server
 		 */
@@ -938,7 +893,7 @@ function toId() {
 					var replayLink = 'https://' + Config.routes.replays + '/' + replayid;
 					$.ajax(replayLink + '.json', {dataType: 'json'}).done(function (replay) {
 						if (replay) {
-							var title = replay.p1 + ' vs. ' + replay.p2;
+							var title = BattleLog.escapeHTML(replay.p1) + ' vs. ' + BattleLog.escapeHTML(replay.p2);
 							app.receive('>battle-' + replayid + '\n|init|battle\n|title|' + title + '\n' + replay.log);
 							app.receive('>battle-' + replayid + '\n|expire|<a href=' + replayLink + ' target="_blank" class="no-panel-intercept">Open replay in new tab</a>');
 						} else {
@@ -1059,7 +1014,6 @@ function toId() {
 				}
 				if (app.ignore[userid]) {
 					delete app.ignore[userid];
-					app.saveIgnore();
 				}
 				break;
 
@@ -1160,18 +1114,6 @@ function toId() {
 				break;
 			}
 		},
-		saveIgnore: function () {
-			Storage.prefs('ignorelist', Object.keys(this.ignore));
-		},
-		loadIgnore: function () {
-			var ignoreList = Storage.prefs('ignorelist');
-			if (!ignoreList) return {};
-			var ignore = {};
-			for (var i = 0; i < ignoreList.length; i++) {
-				ignore[ignoreList[i]] = 1;
-			}
-			return ignore;
-		},
 		parseGroups: function (groupsList) {
 			var data = null;
 			try {
@@ -1271,8 +1213,6 @@ function toId() {
 						}
 						if (teambuilderFormatName !== name) {
 							teambuilderFormat = toID(teambuilderFormatName);
-							if (teambuilderFormat.startsWith('gen8nd')) teambuilderFormat = 'gen8nationaldex' + teambuilderFormat.slice(6);
-							if (teambuilderFormat.startsWith('gen8natdex')) teambuilderFormat = 'gen8nationaldex' + teambuilderFormat.slice(10);
 							if (BattleFormats[teambuilderFormat]) {
 								BattleFormats[teambuilderFormat].isTeambuilderFormat = true;
 							} else {
@@ -2413,7 +2353,7 @@ function toId() {
 		},
 		initialize: function (data) {
 			if (!this.type) this.type = 'semimodal';
-			this.$el.html('<form><p style="white-space:pre-wrap;word-wrap:break-word">' + (data.htmlMessage || BattleLog.parseMessage(data.message)) + '</p><p class="buttonbar">' + (data.buttons || '<button type="button" name="close" class="autofocus"><strong>OK</strong></button>') + '</p></form>').css('max-width', data.maxWidth || 480);
+			this.$el.html('<form><p style="white-space:pre-wrap;word-wrap:break-word">' + (data.htmlMessage || BattleLog.parseMessage(data.message)) + '</p><p class="buttonbar">' + (data.buttons || '<button name="close" class="autofocus"><strong>OK</strong></button>') + '</p></form>').css('max-width', data.maxWidth || 480);
 		},
 
 		dispatchClickButton: function (e) {
@@ -2477,7 +2417,7 @@ function toId() {
 			var buf = '<form>';
 			buf += '<p><label class="label">' + data.message;
 			buf += '<input class="textbox autofocus" type="text" name="data" value="' + BattleLog.escapeHTML(data.value || '') + '" /></label></p>';
-			buf += '<p class="buttonbar"><button type="submit"><strong>' + data.button + '</strong></button> <button type="button" name="close">Cancel</button></p>';
+			buf += '<p class="buttonbar"><button type="submit"><strong>' + data.button + '</strong></button> <button name="close">Cancel</button></p>';
 			buf += '</form>';
 
 			this.$el.html(buf);
@@ -2604,15 +2544,11 @@ function toId() {
 				buf += '<span class="userstatus' + (offline ? ' offline' : '') + '">' + BattleLog.escapeHTML(status) + '<br /></span>';
 			}
 			if (groupName) {
-				buf += '<small class="usergroup roomgroup">' + BattleLog.escapeHTML(groupName) + '</small>';
+				buf += '<small class="usergroup roomgroup">' + groupName + '</small>';
 				if (globalGroupName) buf += '<br />';
 			}
 			if (globalGroupName) {
-				buf += '<small class="usergroup globalgroup">' + BattleLog.escapeHTML(globalGroupName) + '</small>';
-			}
-			if (data.customgroup) {
-				if (groupName || globalGroupName) buf += '<br />';
-				buf += '<small class="usergroup globalgroup">' + BattleLog.escapeHTML(data.customgroup) + '</small>';
+				buf += '<small class="usergroup globalgroup">' + globalGroupName + '</small>';
 			}
 			if (data.rooms) {
 				var battlebuf = '';
@@ -2732,7 +2668,6 @@ function toId() {
 				app.ignore[this.userid] = 1;
 				buf += " ignored. (Moderator messages will not be ignored.)";
 			}
-			app.saveIgnore();
 			var $pm = $('.pm-window-' + this.userid);
 			if ($pm.length && $pm.css('display') !== 'none') {
 				$pm.find('.inner').append('<div class="chat">' + BattleLog.escapeHTML(buf) + '</div>');
@@ -2766,10 +2701,10 @@ function toId() {
 				}
 			} else if (data.message && data.message !== true) {
 				buf += '<p>' + data.message + '</p>';
-				buf += '<p class="buttonbar"><button type="submit" class="autofocus"><strong>Reconnect</strong></button> <button type="button" name="close">Work offline</button></p>';
+				buf += '<p class="buttonbar"><button type="submit" class="autofocus"><strong>Reconnect</strong></button> <button name="close">Work offline</button></p>';
 			} else {
 				buf += '<p>You have been disconnected &ndash; possibly because the server was restarted.</p>';
-				buf += '<p class="buttonbar"><button type="submit" class="autofocus"><strong>Reconnect</strong></button> <button type="button" name="close">Work offline</button></p>';
+				buf += '<p class="buttonbar"><button type="submit" class="autofocus"><strong>Reconnect</strong></button> <button name="close">Work offline</button></p>';
 			}
 
 			buf += '</form>';
@@ -2795,7 +2730,7 @@ function toId() {
 			buf += '<p>Please copy <strong>all the text</strong> from the box above and paste it in the box below.</p>';
 			buf += '<p>(You should probably <a href="https://github.com/smogon/pokemon-showdown-client#test-keys" target="_blank">set up</a> <code>config/testclient-key.js</code> so you don\'t have to do this every time.)</p>';
 			buf += '<p><label class="label" style="float: left;">Data from the box above:</label> <input style="width: 100%;" class="textbox autofocus" type="text" name="result" /></p>';
-			buf += '<p class="buttonbar"><button type="submit"><strong>Submit</strong></button> <button type="button" name="close">Cancel</button></p>';
+			buf += '<p class="buttonbar"><button type="submit"><strong>Submit</strong></button> <button name="close">Cancel</button></p>';
 			buf += '</form>';
 			this.$el.html(buf).css('min-width', 500);
 		},
