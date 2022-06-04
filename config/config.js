@@ -33,7 +33,7 @@ Config.customcolors = {
 	'zarel': 'aeo'
 };
 /*** Begin automatically generated configuration ***/
-Config.version = "0.11.2 (e1ed83ef)";
+Config.version = "0.11.2 (f6a39eb6)";
 
 Config.routes = {
 	root: 'dragonheavenserver.herokuapp.com',
