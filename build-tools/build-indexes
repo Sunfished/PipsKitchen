@@ -47,6 +47,7 @@ function requireNoCache(pathSpec) {
 	return require(pathSpec);
 }
 
+const debug = true;
 /*********************************************************
  * Build search-index.js
  *********************************************************/
@@ -817,8 +818,11 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	const gen3HMs = new Set(['cut', 'fly', 'surf', 'strength', 'flash', 'rocksmash', 'waterfall', 'dive']);
 	const gen4HMs = new Set(['cut', 'fly', 'surf', 'strength', 'rocksmash', 'waterfall', 'rockclimb']);
 
-	function getLearnsetStr(moveid, learnMoveArr) {
+	function getLearnsetStr(moveid, learnMoveArr, pokemonid = "", modid = "") {
 		let learnsetStr = '';
+		if (!learnMoveArr || !learnMoveArr.map) {
+			return "";
+		}
 		const gens = learnMoveArr.map(x => Number(x[0]));
 		const minGen = Math.min(...gens);
 		const vcOnly = (minGen === 7 && learnMoveArr.every(x => x[0] !== '7' || x === '7V') ||
@@ -862,7 +866,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		if (!learnset) continue;
 		learnsets[id] = {};
 		for (const moveid in learnset) {
-			learnsets[id][moveid] = getLearnsetStr(moveid, learnset[moveid]);
+			learnsets[id][moveid] = getLearnsetStr(moveid, learnset[moveid], id, 'standard');
 		}
 	}
 	const G2Learnsets = Dex.mod('gen2').data.Learnsets;
@@ -898,7 +902,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		if (!learnset) continue;
 		BattleTeambuilderTable['gen8dlc1'].learnsets[id] = {};
 		for (const moveid in learnset) {
-			BattleTeambuilderTable['gen8dlc1'].learnsets[id][moveid] = getLearnsetStr(moveid, learnset[moveid]);
+			BattleTeambuilderTable['gen8dlc1'].learnsets[id][moveid] = getLearnsetStr(moveid, learnset[moveid], id, 'gen8dlc1');
 		}
 	}
 
@@ -1069,8 +1073,8 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			if (!ModConfig[modid].customTiers) ModConfig[modid].customTiers = [];
 			if (!ModConfig[modid].customDoublesTiers) ModConfig[modid].customDoublesTiers = [];
 			for (const speciesid in modData.FormatsData) {
-				if (modData.FormatsData[speciesid] === undefined) {
-					console.log('Warning: ' + speciesid + ' does not have tiering data');
+				if (modData.FormatsData[speciesid] === undefined && debug) {
+					console.log('Warning: ' + speciesid + ' does not have tiering data in ' + modid);
 					continue;
 				}
 				const tier = modData.FormatsData[speciesid].tier;
@@ -1177,7 +1181,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 				if (!learnset) continue;
 				if (!learnsets[id]) learnsets[id] = {};
 				for (const moveid in learnset) {
-					const newLearnsetEntry = getLearnsetStr(moveid, learnset[moveid]);
+					const newLearnsetEntry = getLearnsetStr(moveid, learnset[moveid], id, modid);
 					let baseLearnsetEntry = learnsets[id][moveid];
 					if (modGen === 'gen2' || modGen === 'gen1') baseLearnsetEntry = G2Learnsets[id][moveid];
 					const baseLsetNoEarlyGen = baseLearnsetEntry ? baseLearnsetEntry.replace(1, '').replace(2, '') : '';
@@ -1269,9 +1273,11 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		} catch (err) {
 			delete ModConfig[modid];
 			delete BattleTeambuilderTable[modid];
-			console.log("WARNING: Failed to load " + modid);
-			console.log("This was the error:");
-			console.log(err);
+			if (debug) {
+				console.log("WARNING: Failed to load " + modid);
+				console.log("This was the error:");
+				console.log(err);
+			}
 		}
 	}
 
