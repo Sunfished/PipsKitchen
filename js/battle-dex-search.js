@@ -1446,7 +1446,7 @@ if(this.formatType==='doubles'&&BattleMoveSearch.GOOD_DOUBLES_MOVES.includes(id)
 return true;
 }
 
-if(this.mod&&id in BattleTeambuilderTable[this.mod].overrideMoveInfo)return true;
+if(this.mod&&id in BattleTeambuilderTable[this.mod].overrideMoveInfo&&!BattleTeambuilderTable[this.mod].overrideMoveInfo.unviable)return true;
 var moveData=BattleMovedex[id];
 if(!moveData)return true;
 if(moveData.category==='Status'){
