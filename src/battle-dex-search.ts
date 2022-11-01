@@ -1485,6 +1485,7 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 		const isHackmons = (format.includes('hackmons') || format.endsWith('bh'));
 		const isSTABmons = (format.includes('stabmons') || format === 'staaabmons');
 		const galarBornLegality = (format.includes('battlestadium') || format.startsWith('vgc') && this.dex.gen === 8);
+		const isHoennGaiden = this.modFormat === 'gen3hoenngaiden' || this.modFormat.endsWith('hoenngaiden');
 
 		const abilityid = this.set ? toID(this.set.ability) : '' as ID;
 		const itemid = this.set ? toID(this.set.item) : '' as ID;
@@ -1525,6 +1526,10 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 						moves.push(
 							'hiddenpowerbug', 'hiddenpowerdark', 'hiddenpowerdragon', 'hiddenpowerelectric', 'hiddenpowerfighting', 'hiddenpowerfire', 'hiddenpowerflying', 'hiddenpowerghost', 'hiddenpowergrass', 'hiddenpowerground', 'hiddenpowerice', 'hiddenpowerpoison', 'hiddenpowerpsychic', 'hiddenpowerrock', 'hiddenpowersteel', 'hiddenpowerwater'
 						);
+					}
+					if (isHoennGaiden && moveid === 'batonpass') {
+						moves.push('batonpassgaiden');
+						moves.splice(moves.indexOf('batonpass'), 1);
 					}
 				}
 			}
