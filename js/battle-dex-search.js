@@ -1485,6 +1485,7 @@ var format=this.format;
 var isHackmons=format.includes('hackmons')||format.endsWith('bh');
 var isSTABmons=format.includes('stabmons')||format==='staaabmons';
 var galarBornLegality=format.includes('battlestadium')||format.startsWith('vgc')&&this.dex.gen===8;
+var isHoennGaiden=this.modFormat==='gen3hoenngaiden'||this.modFormat.endsWith('hoenngaiden');
 
 var abilityid=this.set?toID(this.set.ability):'';
 var itemid=this.set?toID(this.set.item):'';
@@ -1525,6 +1526,10 @@ if(_moveid==='hiddenpower'){
 moves.push(
 'hiddenpowerbug','hiddenpowerdark','hiddenpowerdragon','hiddenpowerelectric','hiddenpowerfighting','hiddenpowerfire','hiddenpowerflying','hiddenpowerghost','hiddenpowergrass','hiddenpowerground','hiddenpowerice','hiddenpowerpoison','hiddenpowerpsychic','hiddenpowerrock','hiddenpowersteel','hiddenpowerwater');
 
+}
+if(isHoennGaiden&&_moveid==='batonpass'){
+moves.push('batonpassgaiden');
+moves.splice(moves.indexOf('batonpass'),1);
 }
 }
 }
