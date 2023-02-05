@@ -828,7 +828,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const vcOnly = (minGen === 7 && learnMoveArr.every(x => x[0] !== '7' || x === '7V') ||
 			minGen === 8 && learnMoveArr.every(x => x[0] !== '8' || x === '8V'));
 
-		if (minGen <= 4 && (gen3HMs.has(moveid) || gen4HMs.has(moveid))) {
+      if (minGen <= 4 && minGen > 2 && (gen3HMs.has(moveid) || gen4HMs.has(moveid))) {
 			let legalGens = '';
 			let available = false;
 
