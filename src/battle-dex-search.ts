@@ -1302,7 +1302,7 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 			if ([
 				'disable', 'haze', 'leechseed', 'quickattack', 'roar', 'thunder', 'toxic', 'triattack', 'waterfall', 'whirlwind',
 				// banned moves that don't show as useless
-				'dig', 'fly', 'fissure', 'horndrill', 'guillotine'
+				'dig', 'fly', 'fissure', 'horndrill', 'guillotine',
 				// moves that are useless on PS Main but I can't find the reason for coming up elsewhere - this removes them anyway
 				'bide', 'dig', 'dragonrage', 'psywave', 'rage', 'razorwind', 'skullbash', 'swift', 'focusenergy', 'karatechop', 'thrash', 
 				'petaldance', 'bubble', 'barrage', 'bite', 'aurorabeam', 'mist',
