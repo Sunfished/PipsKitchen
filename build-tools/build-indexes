@@ -207,6 +207,7 @@ const debug = true;
 	for (const modid in ModConfig) {
 		for (const key in infoTable) {
 			const modDex = Dex.mod(modid);
+			if (!modDex || !modDex.data || !modDex.data[key]) continue;
 			for (let id in modDex.data[key]) {
 				if (!modDex.data[key][id]) continue;
 				if (!usedIDs.includes(toID(id)) && id in Dex.data.TypeChart === false) {
