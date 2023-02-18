@@ -827,7 +827,8 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const gens = learnMoveArr.map(x => Number(x[0]));
 		const minGen = Math.min(...gens);
 		const vcOnly = (minGen === 7 && learnMoveArr.every(x => x[0] !== '7' || x === '7V') ||
-			minGen === 8 && learnMoveArr.every(x => x[0] !== '8' || x === '8V'));
+			minGen === 8 && learnMoveArr.every(x => x[0] !== '8' || x === '8V')
+			minGen === 9 && learnMoveArr.every(x => x[0] !== '9' || x === '9V'));
 
       if (minGen <= 4 && minGen > 2 && (gen3HMs.has(moveid) || gen4HMs.has(moveid))) {
 			let legalGens = '';
@@ -848,10 +849,10 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			let minUpperGen = available ? 5 : Math.min(
 				...gens.filter(gen => gen > 4)
 			);
-			legalGens += '012345678'.slice(minUpperGen);
+			legalGens += '0123456789'.slice(minUpperGen);
 			learnsetStr = legalGens;
 		} else {
-			learnsetStr = '012345678'.slice(minGen);
+			learnsetStr = '0123456789'.slice(minGen);
 		}
 
 		if (gens.indexOf(6) >= 0) learnsetStr += 'p';

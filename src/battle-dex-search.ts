@@ -799,6 +799,8 @@ abstract class BattleTypedSearch<T extends SearchType> {
 				genChar = 'q';
 			} else if (this.dex.gen === 6) {
 				genChar = 'p';
+			} else if (this.dex.gen === 9) {
+				genChar = 'w';
 			}
 		}
 		let learnsetid = this.firstLearnsetid(speciesid);
