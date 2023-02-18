@@ -799,6 +799,8 @@ genChar='g';
 genChar='q';
 }else if(this.dex.gen===6){
 genChar='p';
+}else if(this.dex.gen===9){
+genChar='w';
 }
 }
 var learnsetid=this.firstLearnsetid(speciesid);
