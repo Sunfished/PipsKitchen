@@ -8,6 +8,8 @@ const child_process = require("child_process");
 const rootDir = path.resolve(__dirname, '..');
 process.chdir(rootDir);
 
+const debug = true;
+
 if (!fs.existsSync('data/pokemon-showdown')) {
 	child_process.execSync('git clone https://github.com/scoopapa/DH.git pokemon-showdown', {
 		cwd: 'data',
@@ -26,7 +28,7 @@ const ModConfigData = require('../config/mod-config').ModConfigData;
 const ModConfig = ModConfigData.ClientMods;
 for (const modid in Dex.dexes) {
 	try {
-		if ((/gen\d/.test(modid) && modid.length === 4) || modid === 'base') continue;
+		if ((/gen\d/.test(modid) && modid.length === 4 && modid !== "gen9") || modid === 'base') continue;
 		let teambuilderConfig = Dex.dexes[modid].data.Scripts.teambuilderConfig;
 		teambuilderConfig = teambuilderConfig ? teambuilderConfig : {};
 		ModConfig[modid] = ModConfig[modid] ? ModConfig[modid] : {};
@@ -58,7 +60,6 @@ function requireNoCache(pathSpec) {
 	return require(pathSpec);
 }
 
-const debug = true;
 /*********************************************************
  * Build search-index.js
  *********************************************************/
@@ -868,10 +869,10 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			let minUpperGen = available ? 5 : Math.min(
 				...gens.filter(gen => gen > 4)
 			);
-			legalGens += '0123456789'.slice(minUpperGen);
+			legalGens += '012345678'.slice(minUpperGen);
 			learnsetStr = legalGens;
 		} else {
-			learnsetStr = '0123456789'.slice(minGen);
+			learnsetStr = '012345678'.slice(minGen);
 		}
 
 		if (gens.indexOf(6) >= 0) learnsetStr += 'p';
