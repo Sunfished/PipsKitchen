@@ -858,6 +858,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		if (gens.indexOf(6) >= 0) learnsetStr += 'p';
 		if (gens.indexOf(7) >= 0 && !vcOnly) learnsetStr += 'q';
 		if (gens.indexOf(8) >= 0 && !vcOnly) learnsetStr += 'g';
+		if (gens.indexOf(9) >= 0 && !vcOnly) learnsetStr += 'w';
 		return learnsetStr;
 	}
 
