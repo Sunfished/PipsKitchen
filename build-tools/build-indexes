@@ -8,6 +8,8 @@ const child_process = require("child_process");
 const rootDir = path.resolve(__dirname, '..');
 process.chdir(rootDir);
 
+const debug = true;
+
 if (!fs.existsSync('data/pokemon-showdown')) {
 	child_process.execSync('git clone https://github.com/scoopapa/DH.git pokemon-showdown', {
 		cwd: 'data',
@@ -20,15 +22,26 @@ child_process.execSync('npm run build', {cwd: 'data/pokemon-showdown'});
 console.log("DONE");
 
 const Dex = require('../data/pokemon-showdown/.sim-dist/dex').Dex;
+
 const toID = Dex.toID;
 const ModConfigData = require('../config/mod-config').ModConfigData;
 const ModConfig = ModConfigData.ClientMods;
 for (const modid in Dex.dexes) {
-	if ((/gen\d/.test(modid) && modid.length === 4) || modid === 'base') continue;
-	let teambuilderConfig = Dex.dexes[modid].data.Scripts.teambuilderConfig;
-	teambuilderConfig = teambuilderConfig ? teambuilderConfig : {};
-	ModConfig[modid] = ModConfig[modid] ? ModConfig[modid] : {};
-	ModConfig[modid] = Object.assign(ModConfig[modid], teambuilderConfig);
+	try {
+		if ((/gen\d/.test(modid) && modid.length === 4 && modid !== "gen9") || modid === 'base') continue;
+		let teambuilderConfig = Dex.dexes[modid].data.Scripts.teambuilderConfig;
+		teambuilderConfig = teambuilderConfig ? teambuilderConfig : {};
+		ModConfig[modid] = ModConfig[modid] ? ModConfig[modid] : {};
+		ModConfig[modid] = Object.assign(ModConfig[modid], teambuilderConfig);
+	} catch(err) {
+		// delete ModConfig[modid];
+		// delete BattleTeambuilderTable[modid];
+		if (debug) {
+			console.log("WARNING: Failed to load config data for " + modid);
+			console.log("This was the error:");
+			console.log(err);
+		}
+	}
 }
 
 process.stdout.write("Loading gen 6 data... ");
@@ -47,7 +60,6 @@ function requireNoCache(pathSpec) {
 	return require(pathSpec);
 }
 
-const debug = true;
 /*********************************************************
  * Build search-index.js
  *********************************************************/
@@ -206,15 +218,23 @@ const debug = true;
 	const infoTable = {Pokedex: 'pokemon', Moves: 'move', Items: 'item', Abilities: 'ability', TypeChart: 'type'};
 	for (const modid in ModConfig) {
 		for (const key in infoTable) {
-			const modDex = Dex.mod(modid);
-			if (!modDex || !modDex.data || !modDex.data[key]) continue;
-			for (let id in modDex.data[key]) {
-				if (!modDex.data[key][id]) continue;
-				if (!usedIDs.includes(toID(id)) && id in Dex.data.TypeChart === false) {
-					index.push(toID(id) + ' ' + infoTable[key]);
-					usedIDs.push(toID(id));
-					const name = modDex.data[key][id].name;
-					if (name) generateAlias(id, name, infoTable[key]);
+			try {
+				const modDex = Dex.mod(modid);
+				if (!modDex || !modDex.data || !modDex.data[key]) continue;
+				for (let id in modDex.data[key]) {
+					if (!modDex.data[key][id]) continue;
+					if (!usedIDs.includes(toID(id)) && id in Dex.data.TypeChart === false) {
+						index.push(toID(id) + ' ' + infoTable[key]);
+						usedIDs.push(toID(id));
+						const name = modDex.data[key][id].name;
+						if (name) generateAlias(id, name, infoTable[key]);
+					}
+				}
+			} catch(err) {
+				if (debug) {
+					console.log("WARNING: Failed to load search data for " + modid);
+					console.log("This was the error:");
+					console.log(err);
 				}
 			}
 		}
@@ -827,7 +847,8 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		const gens = learnMoveArr.map(x => Number(x[0]));
 		const minGen = Math.min(...gens);
 		const vcOnly = (minGen === 7 && learnMoveArr.every(x => x[0] !== '7' || x === '7V') ||
-			minGen === 8 && learnMoveArr.every(x => x[0] !== '8' || x === '8V'));
+			minGen === 8 && learnMoveArr.every(x => x[0] !== '8' || x === '8V') ||
+			minGen === 9 && learnMoveArr.every(x => x[0] !== '9' || x === '9V'));
 
       if (minGen <= 4 && minGen > 2 && (gen3HMs.has(moveid) || gen4HMs.has(moveid))) {
 			let legalGens = '';
@@ -857,6 +878,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 		if (gens.indexOf(6) >= 0) learnsetStr += 'p';
 		if (gens.indexOf(7) >= 0 && !vcOnly) learnsetStr += 'q';
 		if (gens.indexOf(8) >= 0 && !vcOnly) learnsetStr += 'g';
+		if (gens.indexOf(9) >= 0 && !vcOnly) learnsetStr += 'w';
 		return learnsetStr;
 	}
 
@@ -1270,7 +1292,6 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 					overrideTypeChart[id] = modEntry;
 				}
 			}
-			// if (modid === 'm4av6') console.log(formats);
 		} catch (err) {
 			delete ModConfig[modid];
 			delete BattleTeambuilderTable[modid];

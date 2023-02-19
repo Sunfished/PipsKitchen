@@ -958,10 +958,13 @@ class BattleTextParser {
 
 		case '-crit': case '-supereffective': case '-resisted': {
 			const [, pokemon] = args;
+			console.log("pokemon: " + pokemon);
 			let templateId = cmd.slice(1);
+			console.log("templateId: " + templateId);
 			if (templateId === 'supereffective') templateId = 'superEffective';
 			if (kwArgs.spread) templateId += 'Spread';
 			const template = this.template(templateId);
+			console.log("template: " + template);
 			return template.replace('[POKEMON]', this.pokemon(pokemon));
 		}
 

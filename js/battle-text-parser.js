@@ -958,10 +958,13 @@ return this.template('clearAllBoost',kwArgs.from);
 
 case'-crit':case'-supereffective':case'-resisted':{var
 _pokemon29=args[1];
+console.log("pokemon: "+_pokemon29);
 var _templateId8=cmd.slice(1);
+console.log("templateId: "+_templateId8);
 if(_templateId8==='supereffective')_templateId8='superEffective';
 if(kwArgs.spread)_templateId8+='Spread';
 var _template58=this.template(_templateId8);
+console.log("template: "+_template58);
 return _template58.replace('[POKEMON]',this.pokemon(_pokemon29));
 }
 
