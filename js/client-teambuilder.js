@@ -1215,6 +1215,11 @@
 						buf += '<span class="detailcell"><label>Gmax</label>' + (set.gigantamax ? 'Yes' : 'No') + '</span>';
 					}
 				}
+				if (this.curTeam.gen === 9) {
+					// if (species.canGigantamax || species.name.indexOf('-Gmax') >= 0) {
+						buf += '<span class="detailcell"><label>Tera Type</label>' + (set.teraType || 'Dark') + '</span>';
+					// }
+				}
 			}
 			buf += '</button></div></div>';
 			// item/type icons
