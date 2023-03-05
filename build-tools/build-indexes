@@ -334,7 +334,7 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 	const BattleTeambuilderTable = {};
 
 	let buf = '// DO NOT EDIT - automatically built with build-tools/build-indexes\n\n';
-	const GENS = [8, 7, 6, 5, 4, 3, 2, 1];
+	const GENS = [9, 8, 7, 6, 5, 4, 3, 2, 1];
 	const DOUBLES = GENS.filter(x => x > 2).map(num => -num);
 	const NFE = GENS.map(num => num + 0.3);
 	const OTHER = [8.4, 8.2, 8.1, -8.4, 7.1, -7.5];
