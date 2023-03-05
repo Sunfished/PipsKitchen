@@ -869,10 +869,10 @@ process.stdout.write("Building `data/teambuilder-tables.js`... ");
 			let minUpperGen = available ? 5 : Math.min(
 				...gens.filter(gen => gen > 4)
 			);
-			legalGens += '012345678'.slice(minUpperGen);
+			legalGens += '0123456789'.slice(minUpperGen);
 			learnsetStr = legalGens;
 		} else {
-			learnsetStr = '012345678'.slice(minGen);
+			learnsetStr = '0123456789'.slice(minGen);
 		}
 
 		if (gens.indexOf(6) >= 0) learnsetStr += 'p';
