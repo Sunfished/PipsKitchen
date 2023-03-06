@@ -877,6 +877,7 @@ ModdedDex=function(){
 
 function ModdedDex(modid){this.cache={Moves:{},Items:{},Abilities:{},Species:{},Types:{}};this.pokeballs=null;
 this.modid=modid;
+
 if(!modid.startsWith('gen')){
 this.gen=8;
 }else{

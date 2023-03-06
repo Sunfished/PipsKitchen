@@ -877,6 +877,7 @@ class ModdedDex {
 	pokeballs: string[] | null = null;
 	constructor(modid: ID) {
 		this.modid = modid;
+		// const table = window.BattleTeambuilderTable[this.modid];
 		if (!modid.startsWith('gen')) {
 			this.gen = 8;
 		} else {
