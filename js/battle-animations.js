@@ -1283,7 +1283,7 @@ this.addSideCondition(siden,_id4,true);
 
 typeAnim=function typeAnim(pokemon,types){
 var result=BattleLog.escapeHTML(types).split('/').map(function(type){return(
-'<img src="'+Dex.resourcePrefix+'sprites/types/'+type+'.png" alt="'+type+'" class="pixelated" />');}).
+Dex.getTypeIcon(type));}).
 join(' ');
 this.resultAnim(pokemon,result,'neutral');
 };_proto.
@@ -2641,14 +2641,14 @@ status+='<span class="frz">FRZ</span> ';
 }
 if(pokemon.volatiles.typechange&&pokemon.volatiles.typechange[1]){
 var types=pokemon.volatiles.typechange[1].split('/');
-status+='<img src="'+Dex.resourcePrefix+'sprites/types/'+encodeURIComponent(types[0])+'.png" alt="'+types[0]+'" class="pixelated" /> ';
+status+=Dex.getTypeIcon(encodeURIComponent(types[0]));
 if(types[1]){
-status+='<img src="'+Dex.resourcePrefix+'sprites/types/'+encodeURIComponent(types[1])+'.png" alt="'+types[1]+'" class="pixelated" /> ';
+status+=Dex.getTypeIcon(encodeURIComponent(types[1]));
 }
 }
 if(pokemon.volatiles.typeadd){
 var type=pokemon.volatiles.typeadd[1];
-status+='+<img src="'+Dex.resourcePrefix+'sprites/types/'+type+'.png" alt="'+type+'" class="pixelated" /> ';
+status+=Dex.getTypeIcon(type);
 }
 for(var stat in pokemon.boosts){
 if(pokemon.boosts[stat]){
