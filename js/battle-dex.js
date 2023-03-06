@@ -468,7 +468,9 @@ return false;
 
 getSpriteMod=function getSpriteMod(mod,id,folder){var overrideStandard=arguments.length>3&&arguments[3]!==undefined?arguments[3]:false;
 if(!window.ModSprites[id])return'';
+console.log(mod+" "+id);
 if((!mod||!window.ModSprites[id][mod])&&!overrideStandard){
+console.log("looking for sprite");
 for(var modName in window.ModSprites[id]){
 if(window.ModSprites[id][modName].includes(folder))return modName;
 }
