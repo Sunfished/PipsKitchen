@@ -619,6 +619,7 @@ abstract class BattleTypedSearch<T extends SearchType> {
 		const ClientMods = window.ModConfig;
 		if (format.slice(0, 3) === 'gen') {
 			gen = (Number(format.charAt(3)) || 6);
+			if (gen === 9) console.log("gen 9 search detected");
 			let mod = '';
 			let overrideFormat = '';
 			let modFormatType = '';
@@ -633,12 +634,16 @@ abstract class BattleTypedSearch<T extends SearchType> {
 					}
 				}
 			}
+			if (gen === 9) console.log("mod: " + mod);
+			if (mod === "scootopia") console.log( "Gen " + gen + " scootopia");
 			if (mod) {
 				this.dex = Dex.mod(mod as ID);
 				this.dex.gen = gen;
 				this.mod = mod;
+				if (gen === 9) console.log("mod found: " + mod);
 			} else {
 				this.dex = Dex.forGen(gen);
+				if (gen === 9) console.log("mod not found: " + mod);
 			}
 			if (overrideFormat) format = overrideFormat as ID;
 			else format = (format.slice(4) || 'customgame') as ID;
@@ -1233,7 +1238,10 @@ class BattleItemSearch extends BattleTypedSearch<'item'> {
 	getBaseResults(): SearchRow[] {
 		if (!this.species) return this.getDefaultResults();
 		const speciesName = this.dex.getSpecies(this.species).name;
+		console.log(this.mod);
+		console.log(speciesName);
 		const results = this.getDefaultResults();
+		console.log(results);
 		const speciesSpecific: SearchRow[] = [];
 		for (const row of results) {
 			if (row[0] !== 'item') continue;

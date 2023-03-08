@@ -619,6 +619,7 @@ var gen=8;
 var ClientMods=window.ModConfig;
 if(format.slice(0,3)==='gen'){
 gen=Number(format.charAt(3))||6;
+if(gen===9)console.log("gen 9 search detected");
 var mod='';
 var overrideFormat='';
 var modFormatType='';
@@ -633,12 +634,16 @@ break;
 }
 }
 }
+if(gen===9)console.log("mod: "+mod);
+if(mod==="scootopia")console.log("Gen "+gen+" scootopia");
 if(mod){
 this.dex=Dex.mod(mod);
 this.dex.gen=gen;
 this.mod=mod;
+if(gen===9)console.log("mod found: "+mod);
 }else{
 this.dex=Dex.forGen(gen);
+if(gen===9)console.log("mod not found: "+mod);
 }
 if(overrideFormat)format=overrideFormat;else
 format=format.slice(4)||'customgame';
@@ -1233,7 +1238,10 @@ return table.itemSet;
 getBaseResults=function getBaseResults(){
 if(!this.species)return this.getDefaultResults();
 var speciesName=this.dex.getSpecies(this.species).name;
+console.log(this.mod);
+console.log(speciesName);
 var results=this.getDefaultResults();
+console.log(results);
 var speciesSpecific=[];for(var _i8=0;_i8<
 results.length;_i8++){var _this$dex$getItem$ite;var row=results[_i8];
 if(row[0]!=='item')continue;
