@@ -524,8 +524,10 @@ const Dex = new class implements ModdedDex {
 			resourcePrefix = Dex.modResourcePrefix;
 			spriteDir = `${options.mod}/sprites/`;
 			fakeSprite = true;
-			if (this.getSpriteMod(options.mod, id, (isFront ? 'front' : 'back') + '-shiny', species.exists !== false) === '') options.shiny = false;
-		}
+			if (this.getSpriteMod(options.mod, id, (isFront ? 'front' : 'back') + '-shiny', species.exists !== false) === '') {
+				options.shiny = false;
+			}
+		} 
 
 		// Gmax sprites are already extremely large, so we don't need to double.
 		if (species.name.endsWith('-Gmax')) isDynamax = false;
@@ -537,11 +539,16 @@ const Dex = new class implements ModdedDex {
 			url: resourcePrefix + spriteDir,
 			pixelated: true,
 			isFrontSprite: false,
+			reverseFrontSprite: false,
 			cryurl: '',
 			shiny: options.shiny,
 		};
 		// console.log(spriteData.url);
-
+		if (options.mod === '' && !isFront && this.getSpriteMod(options.mod, id, 'front', species.exists !== false) !== '') {
+			options.mod = this.getSpriteMod(options.mod, id, 'front', species.exists !== false);
+			spriteData.reverseFrontSprite = true;
+		}
+		
 		let dir;
 		let facing;
 		if (isFront) {
@@ -758,7 +765,7 @@ const Dex = new class implements ModdedDex {
 			return {
 				spriteDir: `${mod}/sprites/front`,
 				spriteid,
-				shiny: (this.getSpriteMod(mod, id, 'front-shiny', species.exists !== false) !== null && pokemon.shiny),
+				shiny: (this.getSpriteMod(mod, id, 'front-shiny', species.exists !== false) !== '' && pokemon.shiny),
 				x: 10,
 				y: 5,
 			};
@@ -877,6 +884,7 @@ class ModdedDex {
 	pokeballs: string[] | null = null;
 	constructor(modid: ID) {
 		this.modid = modid;
+		// const table = window.BattleTeambuilderTable[this.modid];
 		if (!modid.startsWith('gen')) {
 			this.gen = 8;
 		} else {
