@@ -312,10 +312,22 @@ const Dex = new class implements ModdedDex {
 		return move;
 	}
 
-	getGen3Category(type: string) {
-		return [
-			'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dark', 'Dragon',
-		].includes(type) ? 'Special' : 'Physical';
+	getCategory(type: string, mod: string) {
+		if (mod === 'gen1kantoexpansionpak') {
+			return [
+				'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dark', 'Dragon', 'Fairy',
+			].includes(type) ? 'Special' : 'Physical';
+		}
+		else if (mod === 'gen2crystalseviiislands') {
+			return [
+				'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dark', 'Dragon', 'Cosmic',
+			].includes(type) ? 'Special' : 'Physical';
+		} 
+		else {
+			return [
+				'Fire', 'Water', 'Grass', 'Electric', 'Ice', 'Psychic', 'Dark', 'Dragon',
+			].includes(type) ? 'Special' : 'Physical';
+		}
 	}
 
 	getItem(nameOrItem: string | Item | null | undefined): Item {
@@ -908,7 +920,7 @@ class ModdedDex {
 			}
 		}
 		if (this.gen <= 3 && data.category !== 'Status') {
-			data.category = Dex.getGen3Category(data.type);
+			data.category = Dex.getCategory(data.type, modid);
 		}
 		const move = new Move(id, name, data);
 		this.cache.Moves[id] = move;
