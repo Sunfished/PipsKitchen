@@ -312,10 +312,22 @@ window.BattleMovedex[id]=move;
 return move;
 };_proto2.
 
-getGen3Category=function getGen3Category(type){
+getCategory=function getCategory(type,mod){
+if(mod==='gen1kantoexpansionpak'){
+return[
+'Fire','Water','Grass','Electric','Ice','Psychic','Dark','Dragon','Fairy'].
+includes(type)?'Special':'Physical';
+}else
+if(mod==='gen2crystalseviiislands'){
+return[
+'Fire','Water','Grass','Electric','Ice','Psychic','Dark','Dragon','Cosmic'].
+includes(type)?'Special':'Physical';
+}else
+{
 return[
 'Fire','Water','Grass','Electric','Ice','Psychic','Dark','Dragon'].
 includes(type)?'Special':'Physical';
+}
 };_proto2.
 
 getItem=function getItem(nameOrItem){
@@ -908,7 +920,7 @@ data=Object.assign({},Dex.getMove(name),table.overrideMoveInfo[id]);
 }
 }
 if(this.gen<=3&&data.category!=='Status'){
-data.category=Dex.getGen3Category(data.type);
+data.category=Dex.getCategory(data.type,modid);
 }
 var move=new Move(id,name,data);
 this.cache.Moves[id]=move;
