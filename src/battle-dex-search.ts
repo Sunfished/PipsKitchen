@@ -1303,7 +1303,8 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 			// Usually not useless for Gen 1
 			if ([
 				'acidarmor', 'amnesia', 'barrier', 'bind', 'blizzard', 'clamp', 'confuseray', 'counter', 'firespin', 'growth', 
-				'headbutt', 'hyperbeam', 'mirrormove', 'pinmissile', 'razorleaf', 'sing', 'slash', 'sludge', 'twineedle', 'wrap',			
+				'headbutt', 'hyperbeam', 'mirrormove', 'pinmissile', 'razorleaf', 'sing', 'slash', 'sludge', 'twineedle', 'wrap', 
+				'mega drain'
 			].includes(id)) {
 				return true;
 			}
@@ -1315,7 +1316,7 @@ class BattleMoveSearch extends BattleTypedSearch<'move'> {
 				'dig', 'fly', 'fissure', 'horndrill', 'guillotine',
 				// moves that are useless on PS Main but I can't find the reason for coming up elsewhere - this removes them anyway
 				'bide', 'dig', 'dragonrage', 'psywave', 'rage', 'razorwind', 'skullbash', 'swift', 'focusenergy', 'karatechop', 'thrash', 
-				'petaldance', 'bubble', 'barrage', 'bite', 'aurorabeam', 'mist',
+				'petaldance', 'bubble', 'barrage', 'bite', 'aurorabeam', 'mist', 'vine whip', 'tackle'
 			].includes(id)) {
 				return false;
 			}
