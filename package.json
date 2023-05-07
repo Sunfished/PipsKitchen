@@ -8,6 +8,7 @@
     "type": "git",
     "url": "https://github.com/Zarel/Pokemon-Showdown-Client.git"
   },
+  "main": "web.js",
   "scripts": {
     "lint": "eslint --config=.eslintrc.js --cache --cache-file=eslint-cache/base js/ && eslint --config=build-tools/.eslintrc.js --cache --cache-file=eslint-cache/build build-tools/update build-tools/build-indexes && tslint --project .",
     "test": "npm run lint && tsc && node build && mocha test/*.js",
