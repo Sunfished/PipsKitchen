@@ -1,1 +1,1 @@
-test: start index.html
+test: http-server
