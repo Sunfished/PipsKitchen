@@ -1,1 +1,1 @@
-web: node index.html
+web: http-server -p index.html
