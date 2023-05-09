@@ -1441,7 +1441,7 @@ process.stdout.write("Building `data/moves,items,abilities,typechart,learnsets.j
 	const modDir = fs.readdirSync('data/DH/data/mods/');
 	for (const i in modDir) {
 		const modName = modDir[i];
-		const subFolders = ['front', 'front-shiny', 'back', 'back-shiny', 'icons', 'types', 'items'];
+		const subFolders = ['ani-front', 'ani-back', 'ani-front-shiny', 'ani-back-shiny', 'front', 'front-shiny', 'back', 'back-shiny', 'icons', 'types', 'items'];
 		for (const j in subFolders) {
 			const subF = subFolders[j];
 			const spritePath = 'data/DH/data/mods/' + modName + '/sprites/' + subF;
