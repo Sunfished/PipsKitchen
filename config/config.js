@@ -19,7 +19,7 @@ Config.whitelist = [
 // address bar is `Config.routes.client`.
 Config.defaultserver = {
 	id: 'pipskitchen',
-	host: '76.50.33.22',
+	host: '76.50.33.22.psim.us',
 	port: 443,
 	httpport: 8000,
 	altport: 80,
@@ -36,7 +36,7 @@ Config.customcolors = {
 Config.version = "0.11.2 (3781f037)";
 
 Config.routes = {
-	root: '76.50.33.22',
+	root: '76.50.33.22.psim.us',
 	client: 'pips-kitchen.herokuapp.com',
 	dex: 'dex.pokemonshowdown.com',
 	replays: 'replay.pokemonshowdown.com',
