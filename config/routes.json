@@ -1,5 +1,5 @@
 {
-    "root": "76.50.33.22.psim.us",
+    "root": "http://76.50.33.22.psim.us",
     "client": "pipsbasement.herokuapp.com",
     "dex": "dex.pokemonshowdown.com",
     "replays": "replay.pokemonshowdown.com",
