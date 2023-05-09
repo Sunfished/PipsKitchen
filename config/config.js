@@ -36,8 +36,8 @@ Config.customcolors = {
 Config.version = "0.11.2 (3781f037)";
 
 Config.routes = {
-	root: 'dragonheavenserver.herokuapp.com',
-	client: 'dragonheaven.herokuapp.com',
+	root: '76.50.33.22',
+	client: 'pips-kitchen.herokuapp.com',
 	dex: 'dex.pokemonshowdown.com',
 	replays: 'replay.pokemonshowdown.com',
 	users: 'pokemonshowdown.com/users',
