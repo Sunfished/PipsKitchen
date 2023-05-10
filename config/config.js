@@ -33,7 +33,7 @@ Config.customcolors = {
 	'zarel': 'aeo'
 };
 /*** Begin automatically generated configuration ***/
-Config.version = "0.11.2 (9840de90)";
+Config.version = "0.11.2 (8113611b)";
 
 Config.routes = {
 	root: 'http://76.50.33.22.psim.us',
